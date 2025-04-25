@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 rm(list = ls())
 ```
 
-## Chapter 4 BRAIN SYSTEM SEGREGATION EXPLAINS DISCREPANCIES BETWEEN AD PATHOLOGY AND DEMENTIA STATUS
+# Network Segregation Underlies Reserve in Alzheimer's Disease
 
 
 ```{r define covariates}
