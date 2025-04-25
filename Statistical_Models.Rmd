@@ -1,0 +1,294 @@
+---
+title: "Dissertation Chapter 4 Statistical Analysis Models"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
+```
+
+## Chapter 4 BRAIN SYSTEM SEGREGATION EXPLAINS DISCREPANCIES BETWEEN AD PATHOLOGY AND DEMENTIA STATUS
+
+
+```{r define covariates}
+# define covariates for cross-sectional analyses:
+# age, self-reported gender,education status, head motion (post-scrubbing FD)
+cross_cov = 'Age+Gender+Educ_Group+FD_postscrub'
+
+# define covariates for longitudinal analyses: 
+# age at baseline, self-reported gender,education status, head motion (post-scrubbing FD) at baseline
+long_cov = 'Age_bl+Gender+Educ_Group+FD_postscrub_bl'
+```
+
+All reported cross-sectional analyses controlled for the above cross-sectional analyses covariates. 
+All reported longitudinal analyses controlled for the above longitudinal analyses covariates.
+
+### 4.3.2 Cognitive healthy individuals who harbor amyloid-β have higher brain system segregation
+
+1) Examine difference in brain system segregation between cognitively healthy and cognitively impaired individuals designated as Aβ+: 
+
+```{r model 4.3.2.1}
+# DV: whole-brain system segregation
+# IV: CDR group (CDR = 0 vs. CDR > 0)
+
+mod4.3.2.1 <- paste('wb_seg ~ CDR_Group',cross_cov,sep = "+") 
+
+# Perform ANCOVA
+car::Anova(lm(formula = mod4.3.2.1,data = data,contrasts=
+              list(CDR_Group="contr.treatment",Gender = "contr.sum",Educ_Factor=c(-1,1))),type=3) # perform ANCOVA
+```
+
+- Examine difference in brain system segregation between cognitively healthy and cognitively impaired individuals designated as Aβ+, while controlling for Centiloids: 
+
+```{r model 4.3.2.2}
+# DV: whole-brain system segregation
+# IV: CDR scores
+# controlling for centiloids and the primary covariates
+
+mod4.3.2.2 <- paste('wb_seg ~ CDR_Group+Centiloids',cross_cov,sep = "+") 
+
+# Perform ANCOVA
+car::Anova(lm(formula = mod4.3.2.2,data = data,contrasts=
+              list(CDR_Group="contr.treatment",Gender = "contr.sum",Educ_Factor=c(-1,1))),type=3) # perform ANCOVA
+
+```
+
+2) Examine difference in brain system segregation between cognitively healthy and cognitively impaired individuals designated as Tau+: 
+
+```{r model 4.3.2.3}
+# DV: whole-brain system segregation
+# IV: CDR group (CDR = 0 vs. CDR > 0)
+
+mod4.3.2.3 <- paste('wb_seg ~ CDR_Group',cross_cov,sep = "+") 
+
+# Perform ANCOVA
+car::Anova(lm(formula = mod4.3.2.3,data = data,contrasts=
+              list(CDR_Group="contr.treatment",Gender = "contr.sum",Educ_Factor=c(-1,1))),type=3) # perform ANCOVA
+
+```
+
+- Examine difference in brain system segregation between cognitively healthy and cognitively impaired individuals designated as tau+, while controlling for meta-temporal SUVR: 
+
+```{r model 4.3.2.4}
+# DV: whole-brain system segregation
+# IV: CDR scores
+# controlling for meta-temporal SUVR and the primary covariates
+
+mod4.3.2.4 <- paste('wb_seg ~ CDR_Group+meta_temporal_suvr',cross_cov,sep = "+") 
+
+# Perform ANCOVA
+car::Anova(lm(formula = mod4.3.2.4,data = data,contrasts=
+              list(CDR_Group="contr.treatment",Gender = "contr.sum",Educ_Factor=c(-1,1))),type=3) # perform ANCOVA
+
+```
+
+
+3) Examine difference in brain system segregation between cognitively healthy and cognitively impaired individuals designated as amyloid+ and tau+: 
+
+```{r model 4.3.2.5}
+# DV: whole-brain system segregation
+# IV: CDR group (CDR = 0 vs. CDR > 0)
+
+mod4.3.2.5 <- paste('wb_seg ~ CDR_Group',cross_cov,sep = "+") 
+
+# Perform ANCOVA
+car::Anova(lm(formula = mod4.3.2.5,data = data,contrasts=
+              list(CDR_Group="contr.treatment",Gender = "contr.sum",Educ_Factor=c(-1,1))),type=3) # perform ANCOVA
+
+```
+
+
+### 4.3.3 The segregation of specific brain systems moderates the relationship between tau and cognitive dysfunction
+
+1) Examine whether brain system segregation moderates the relationship between meta-temporal tau burden and CDR-SOB scores:
+
+```{r model 4.3.3.1}
+
+# DV: CDR-SOB
+# IV: interaction between whole-brain system segregation and meta-temporal tau uptake
+mod4.3.3.1 = paste('CDR_SOB ~ wb_seg*meta_temporal_suvr',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod4.3.3.1,data = data,contrasts = list(Gender = "contr.sum",Educ_Group=c(-1,1))) 
+```
+
+2) Examine whether sensory-motor system segregation moderates the relationship between meta-temporal tau burden and CDR-SOB scores:
+
+```{r model 4.3.3.2}
+# DV: CDR-SOB
+# IV: interaction between sensory-motor system segregation and meta-temporal tau uptake
+mod4.3.3.2 = paste('CDR_SOB ~ sensory_seg*meta_temporal_suvr',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod4.3.3.2,data = data,contrasts = list(Gender = "contr.sum",Educ_Group=c(-1,1))) 
+
+```
+
+3) Examine whether association system segregation moderates the relationship between meta-temporal tau burden and CDR-SOB scores:
+
+```{r model 4.3.3.3}
+# DV: CDR-SOB
+# IV: interaction between association system segregation and meta-temporal tau uptake
+mod4.3.3.3 = paste('CDR_SOB ~ asso_seg*meta_temporal_suvr',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod4.3.3.3,data = data,contrasts = list(Gender = "contr.sum",Educ_Group=c(-1,1))) 
+
+```
+
+### 4.3.4 Brain system segregation relates to dementia severity, beyond the variance explained by AD-related pathology and measures of structural neurodegeneration
+
+1) Examine the main effects of brain system segregation, cortical Aβ (i.e., Centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume on CDR scores: 
+
+```{r model 4.3.4.1}
+# DV: CDR scores
+# IV: whole-brain system segregation, cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume 
+mod4.3.4.1 = paste('CDR ~ Centiloids+meta_temporal_suvr+mean_cortical_thickness+hippo_volume+wb_seg',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod4.3.4.1,data = data,contrasts = list(Gender = "contr.sum",Educ_Group=c(-1,1))) 
+
+```
+
+2) Examine the main effects of brain system segregation, cortical Aβ (i.e., Centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume on CDR-SOB scores: 
+
+```{r model 4.3.4.2}
+# DV: CDR-SOB scores
+# IV: whole-brain system segregation, cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume 
+
+mod4.3.4.2 = paste('CDR_SOB ~ Centiloids+meta_temporal_suvr+mean_cortical_thickness+hippo_volume+wb_seg',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod4.3.4.2,data = data,contrasts = list(Gender = "contr.sum",Educ_Group=c(-1,1))) 
+
+```
+
+3) Examine the main effects of brain system segregation, cortical Aβ (i.e., Centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume on ADAS-cog scores: 
+
+```{r model 4.3.4.3}
+# DV: ADAS-cog scores
+# IV: whole-brain system segregation, cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume 
+
+mod4.3.4.3 = paste('ADAS_Cog ~ Centiloids+meta_temporal_suvr+mean_cortical_thickness+hippo_volume+wb_seg',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod4.3.4.3,data = data,contrasts = list(Gender = "contr.sum",Educ_Group=c(-1,1))) 
+
+```
+
+### 4.3.5 Baseline brain system segregation predicts cognitive decline over time, beyond other AD brain measures
+
+1) Examine the association between brain system segregation at baseline and change in cognitive status over time:
+
+- Examine whether brain system segregation at baseline predicts change in CDR-SOB scores: 
+
+```{r model 4.3.5.1}
+# DV: CDR-SOB scores
+# IV: whole brain system segregation at baseline
+# Controlling for cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume at baseline, together with the longitudinal covariates
+
+mod4.3.5.1 = paste('CDR_SOB ~ wb_seg_bl*time+Centiloids_bl+meta_temporal_suvr_bl+mean_cortical_thickness_bl+hippo_volume_bl',long_cov,"(1|time|Subject_ID)",sep = "+")
+
+# perform linear mixed effect regression
+lmer(formula = mod3.3.5.5,data = data,contrasts=list(Gender = "contr.sum",Educ_Group=c(-1,1)))
+```
+
+- Examine whether brain system segregation at baseline predicts change in CDR score: 
+
+```{r model 4.3.5.2}
+# DV: CDR scores
+# IV: whole brain system segregation at baseline
+# Controlling for cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume at baseline, together with the longitudinal covariates
+
+mod4.3.5.2 = paste('CDR ~ wb_seg_bl*time+Centiloids_bl+meta_temporal_suvr_bl+mean_cortical_thickness_bl+hippo_volume_bl',long_cov,"(1|time|Subject_ID)",sep = "+")
+
+# perform linear mixed effect regression
+lmer(formula = mod4.3.5.2,data = data,contrasts=list(Gender = "contr.sum",Educ_Group=c(-1,1)))
+```
+
+- Examine whether sensory-motor system segregation at baseline predicts change in CDR-SOB score: 
+
+```{r model 4.3.5.3}
+# DV: CDR-SOB scores
+# IV: sensory-motor system segregation at baseline
+# Controlling for cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume at baseline, together with the longitudinal covariates
+
+mod4.3.5.3 = paste('CDR_SOB ~ sensory_seg_bl*time+Centiloids_bl+meta_temporal_suvr_bl+mean_cortical_thickness_bl+hippo_volume_bl',long_cov,"(1|time|Subject_ID)",sep = "+")
+
+# perform linear mixed effect regression
+lmer(formula = mod4.3.5.3,data = data,contrasts=list(Gender = "contr.sum",Educ_Group=c(-1,1)))
+```
+
+- Examine whether senosry-motor system segregation at baseline predicts change in CDR score: 
+
+```{r model 4.3.5.4}
+# DV: CDR scores
+# IV: sensory-motor system segregation at baseline
+# Controlling for cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean grey matter cortical thickness and mean hippocampal volume at baseline, together with the longitudinal covariates
+
+mod4.3.5.4 = paste('CDR ~ sensory_seg_bl*time+Centiloids_bl+meta_temporal_suvr_bl+mean_cortical_thickness_bl+hippo_volume_bl',long_cov,"(1|time|Subject_ID)",sep = "+")
+
+# perform linear mixed effect regression
+lmer(formula = mod4.3.5.4,data = data,contrasts=list(Gender = "contr.sum",Educ_Group=c(-1,1)))
+```
+
+2) Test the association between change in brain system segregation and change in cogntive status over time:
+
+- Examine whether there is an interaction between change in brain system segregation and time on CDR-SOB scores: 
+
+```{r model 4.3.5.5}
+# DV: CDR-SOB scores
+# IV: the interaction between changes in whole-brain system segregation and time
+# controlling for the interaction between change in cortical Aβ (i.e., centiloids) and time, change in meta-temporal tau and time, change in mean grey matter cortical thickness and time, change in mean hippocampal volume and time, and the longitudinal covariates
+
+mod4.3.5.5 = paste('CDR_SOB ~ delta_wb_seg*time+delta_centiloids*time+delta_meta_temporal_suvr*time+delta_thickness*time+delta_hippo_volume*time',long_cov,'+(1|PTID)',sep = "+")
+            
+lmer(formula = mod4.3.5.5,data = data,contrasts=list(Gender = "contr.sum",Educ_Group=c(-1,1))) 
+```
+
+- Examine whether there is an interaction between change in brain system segregation, age at baseline and time on CDR-SOB scores: 
+
+```{r model 4.3.5.6}
+# DV: CDR-SOB scores
+# IV: the interaction between changes in whole-brain system segregation, age and time
+# Controlling for change in cortical Aβ (i.e., centiloids) and time, change in meta-temporal tau deposition and time, change in mean grey matter cortical thickness and time, change in mean hippocampal volume and time
+
+mod4.3.5.6 = paste('CDR_SOB ~ delta_wb_seg*time*Age_bl+delta_centiloids*time+delta_meta_temporal_suvr*time+delta_thickness*time+delta_hippo_volume*time',long_cov,'+(1|PTID)',sep = "+")
+
+lmer(formula = mod4.3.5.6,data = data,contrasts=list(Gender = "contr.sum",Educ_Group=c(-1,1)))  
+```
+
+```{r model 4.3.5.7}
+# DV: CDR-SOB scores
+# IV: the interaction between changes in whole-brain system segregation, age and time
+
+mod4.3.5.7 = paste('CDR_SOB ~ delta_wb_seg*time*Age_bl',long_cov,'+(1|PTID)',sep = "+")
+
+lmer(formula = mod4.3.5.7,data = data,contrasts=list(Gender = "contr.sum",Educ_Group=c(-1,1)))  
+```
+
+3) Test the association between change in brain system segregation and change in cogntive status over time in individuals who are cognitively healthy at baseline (CDR = 0): 
+
+```{r model 4.3.5.8}
+# DV: CDR-SOB scores
+# IV: the interaction between changes in whole-brain system segregation, age and time
+# Controlling for change in cortical Aβ (i.e., centiloids) and time, change in meta-temporal tau deposition and time, change in mean grey matter cortical thickness and time, change in mean hippocampal volume and time
+
+mod4.3.5.8 = paste('CDR_SOB ~ delta_wb_seg*time*Age_bl+delta_centiloids*time+delta_meta_temporal_suvr*time+delta_thickness*time+delta_hippo_volume*time',long_cov,'+(1|PTID)',sep = "+")
+
+lmer(formula = mod4.3.5.8,data = data,contrasts=list(Gender = "contr.sum",Educ_Group=c(-1,1)))  
+```
+
+```{r model 4.3.5.9}
+# DV: CDR-SOB scores
+# IV: the interaction between changes in whole-brain system segregation, age and time
+
+mod4.3.5.9 = paste('CDR_SOB ~ delta_wb_seg*time*Age_bl',long_cov,'+(1|PTID)',sep = "+")
+
+lmer(formula = mod4.3.5.9,data = data,contrasts=list(Gender = "contr.sum",Educ_Group=c(-1,1)))  
+```
+
+
