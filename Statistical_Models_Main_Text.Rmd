@@ -1,0 +1,159 @@
+---
+title: "Statistical Analysis Models (Main Text)"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
+```
+
+# Resting-state system segregation underlies reserve in Alzheimer’s disease 
+
+
+```{r define covariates}
+# define covariates for cross-sectional analyses:
+# age, self-reported gender, head motion (post-scrubbing FD)
+cross_cov = 'Age+Gender+FD_postscrub'
+
+# define covariates for longitudinal analyses: 
+# age at baseline, self-reported gender, head motion (post-scrubbing FD) at baseline
+long_cov = 'Age_bl+Gender+FD_postscrub_bl'
+```
+
+For analyses comparing cross-sectional differences in cognitive status/function and system segregation, all analyses included the cross-sectional analyses covariates indicated above.
+
+For analyses comparing baseline system segregation and longitudinal changes in cognitive status/function, 
+all analyses included the longitudinal analyses covariates indicated above.
+
+## Functional brain network organization supports cognitive health among individuals with AD-related pathological burden
+
+### Resting-state system segregation explains discrepancies in cognitive status among individuals with high amyloid burden
+
+1) Examine difference in brain system segregation between cognitively unimpaired and cognitively impaired individuals designated as Aβ+: 
+
+```{r model 1.1}
+# DV: whole-brain system segregation
+# IV: CDR group (CDR = 0 vs. CDR > 0)
+
+mod1.1 <- paste('wb_seg ~ CDR_Group',cross_cov,sep = "+") 
+
+# Perform ANCOVA
+car::Anova(lm(formula = mod1.1,data = data,contrasts=
+              list(CDR_Group="contr.treatment",Gender = "contr.sum")),type=3)
+```
+
+- Examine difference in brain system segregation between cognitively unimpaired and cognitively impaired individuals designated as Aβ+, while controlling for Centiloids: 
+
+```{r model 1.2}
+# DV: whole-brain system segregation
+# IV: CDR group (CDR = 0 vs. CDR > 0)
+# controlling for Centiloids and the primary covariates
+
+mod1.2 <- paste('wb_seg ~ CDR_Group+Centiloids',cross_cov,sep = "+") 
+
+# Perform ANCOVA
+car::Anova(lm(formula = mod1.2,data = data,contrasts=
+              list(CDR_Group="contr.treatment",Gender = "contr.sum")),type=3)
+
+```
+
+- Examine difference in system segregation between cognitively unimpaired and cognitively impaired individuals designated as Aβ+, while treating CDR as a continuous variable:
+
+```{r model 1.3}
+# DV: system segregation
+# IV: CDR 
+# controlling for the primary covariates and Centiloids
+
+mod1.3 <- paste('wb_seg ~ CDR+Centiloids',cross_cov,sep = "+") 
+
+# Perform multiple regression:
+lm(formula = mod1.3,data = data,contrasts = list(Gender = "contr.sum")) 
+```
+
+2) Examine difference in system segregation between cognitively healthy and cognitively impaired individuals designated as Aβ+ and tau+: 
+
+```{r model 1.4}
+# DV: whole-brain system segregation
+# IV: CDR group (CDR = 0 vs. CDR > 0)
+
+mod1.4 <- paste('wb_seg ~ CDR_Group',cross_cov,sep = "+") 
+
+# Perform ANCOVA
+car::Anova(lm(formula = mod1.4,data = data,contrasts=
+              list(CDR_Group="contr.treatment",Gender = "contr.sum")),type=3)
+
+```
+
+3) Examine whether system segregation moderates the relationship between tau and cognitive dysfunction
+
+-Examine whether sensory-motor system segregation moderates the relationship between meta-temporal tau burden and CDR-SOB scores:
+
+```{r model 1.5}
+# DV: CDR-SOB
+# IV: interaction between sensory-motor system segregation and meta-temporal tau uptake
+mod1.5 = paste('CDR_SOB ~ sensory_seg*meta_temporal_suvr',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod1.5,data = data,contrasts = list(Gender = "contr.sum")) 
+
+```
+
+- Examine whether association system segregation moderates the relationship between meta-temporal tau burden and CDR-SOB scores:
+
+```{r model 1.6}
+# DV: CDR-SOB
+# IV: interaction between association system segregation and meta-temporal tau uptake
+mod1.6 = paste('CDR_SOB ~ asso_seg*meta_temporal_suvr',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod1.6,data = data,contrasts = list(Gender = "contr.sum")) 
+
+```
+
+### Resting-state system segregation relates to dementia severity, beyond the variance explained by AD-related pathology and brain structure
+
+- Examine the main effects of system segregation, cortical Aβ (i.e., Centiloids), meta-temporal tau deposition, mean total grey matter cortical thickness and mean hippocampal volume on CDR scores: 
+
+```{r model 2.1}
+# DV: CDR scores
+# IV: whole-brain system segregation, cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean total grey matter cortical thickness and mean hippocampal volume 
+
+mod2.1= paste('CDR ~ wb_seg+Centiloids+meta_temporal_suvr+mean_cortical_thickness+hippo_volume',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod2.1,data = data,contrasts = list(Gender = "contr.sum")) 
+
+```
+
+### The relationship between cognitive status and system segregation varies in relation to educational attainment 
+
+- Examine the moderating effects of education on the relationship between system segregation and CDR scores, controlling for the effects of cortical Aβ (i.e., Centiloids), meta-temporal tau deposition, mean total grey matter cortical thickness, and mean hippocampal volume 
+
+```{r model 3.1}
+# DV: CDR scores
+# IV: interaction between whole-brain system segregation and education 
+mod2.1= paste('CDR ~ wb_seg*Educ_Group+Centiloids+meta_temporal_suvr+mean_cortical_thickness+hippo_volume',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod2.1,data = data,contrasts = list(Gender = "contr.sum",Educ_Group=c(-1,1)))
+```
+
+## An individual’s resting-state system segregation predicts their cognitive decline over time, irrespective of their AD-related pathology and brain structure
+
+1) Examine whether system segregation at baseline predicts change in CDR score: 
+
+```{r model 3.1}
+# DV: CDR scores
+# IV: whole brain system segregation at baseline
+# Controlling for cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean total grey matter cortical thickness and mean hippocampal volume at baseline, together with the longitudinal covariates
+
+mod3.1 = paste('CDR ~ wb_seg_bl*time+Centiloids_bl+meta_temporal_suvr_bl+mean_cortical_thickness_bl+hippo_volume_bl',long_cov,"(1+time|Subject_ID)",sep = "+")
+
+# perform linear mixed effect regression
+lmer(formula = mod3.1,data = data,contrasts=list(Gender = "contr.sum"))
+```
+
+

@@ -1,0 +1,85 @@
+---
+title: "Statistical Analysis Models (Supplemental Material)"
+author: "Ziwei Zhang"
+date: "2025-04-25"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Resting-state system segregation underlies reserve in Alzheimer’s disease 
+
+```{r define covariates}
+# define covariates for cross-sectional analyses:
+# age, self-reported gender, head motion (post-scrubbing FD)
+cross_cov = 'Age+Gender+FD_postscrub'
+
+# define covariates for longitudinal analyses: 
+# age at baseline, self-reported gender, head motion (post-scrubbing FD) at baseline
+long_cov = 'Age_bl+Gender+FD_postscrub_bl'
+```
+
+For analyses comparing cross-sectional differences in cognitive status/function and system segregation, all analyses included the cross-sectional analyses covariates indicated above.
+
+For analyses comparing baseline system segregation and longitudinal changes in cognitive status/function, 
+all analyses included the longitudinal analyses covariates indicated above.
+
+
+## An individual’s resting-state system segregation predicts their cognitive decline over time, irrespective of their AD-related pathology and brain structure
+
+- Examine whether brain system segregation at baseline predicts change in CDR-SOB scores: 
+
+```{r model supp 1.1}
+# DV: CDR-SOB scores
+# IV: whole brain system segregation at baseline
+# Controlling for cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean total grey matter cortical thickness and mean hippocampal volume at baseline, together with the longitudinal covariates
+
+mod1.1 = paste('CDR_SOB ~ wb_seg_bl*time+Centiloids_bl+meta_temporal_suvr_bl+mean_cortical_thickness_bl+hippo_volume_bl',long_cov,"(1|time|Subject_ID)",sep = "+")
+
+# perform linear mixed effect regression
+lmer(formula = mod1.1,data = data,contrasts=list(Gender = "contr.sum"))
+```
+
+## The relationship between resting-state system segregation and cognitive status persists when replacing total grey matter cortical thickness with an AD-signature cortical thickness measure
+
+- Examine the main effects of system segregation, cortical Aβ (i.e., Centiloids), meta-temporal tau deposition, mean meta-ROI cortical thickness and mean hippocampal volume on CDR scores: 
+
+```{r model 2.1}
+# DV: CDR scores
+# IV: whole-brain system segregation, cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean meta-ROI cortical thickness and mean hippocampal volume 
+
+mod2.1= paste('CDR ~ wb_seg+Centiloids+meta_temporal_suvr+mean_metaROI_thickness+hippo_volume',cross_cov,sep = "+") 
+
+#perform multiple linear regression
+lm(formula = mod2.1,data = data,contrasts = list(Gender = "contr.sum")) 
+
+```
+
+- Examine whether system segregation at baseline predicts change in CDR score: 
+
+```{r model 2.2}
+# DV: CDR scores
+# IV: whole brain system segregation at baseline
+# Controlling for cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean meta-ROI cortical thickness and mean hippocampal volume at baseline, together with the longitudinal covariates
+
+mod2.2 = paste('CDR ~ wb_seg_bl*time+Centiloids_bl+meta_temporal_suvr_bl+mean_metaROI_thickness_bl+hippo_volume_bl',long_cov,"(1+time|Subject_ID)",sep = "+")
+
+# perform linear mixed effect regression
+lmer(formula = mod2.2,data = data,contrasts=list(Gender = "contr.sum"))
+```
+
+- Examine whether system segregation at baseline predicts change in CDR-SOB score: 
+
+```{r model 2.3}
+# DV: CDR-SOB scores
+# IV: whole brain system segregation at baseline
+# Controlling for cortical Aβ (i.e., centiloids), meta-temporal tau deposition, mean meta-ROI cortical thickness and mean hippocampal volume at baseline, together with the longitudinal covariates
+
+mod2.3 = paste('CDR_SOB ~ wb_seg_bl*time+Centiloids_bl+meta_temporal_suvr_bl+mean_metaROI_thickness_bl+hippo_volume_bl',long_cov,"(1+time|Subject_ID)",sep = "+")
+
+# perform linear mixed effect regression
+lmer(formula = mod2.3,data = data,contrasts=list(Gender = "contr.sum"))
+```
+
